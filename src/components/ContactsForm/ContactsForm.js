@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
-import { nanoid } from 'nanoid';
-import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
+
+import { useSelector, useDispatch } from 'react-redux';
+import * as actions from '../redux/phonebook-actions';
+import { getContacts } from '../redux/phonebook-selectors';
+
 import s from './Form.module.css';
 
-export default function ContactsForm({ formData }) {
+export default function ContactsForm() {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+  const contacts = useSelector(getContacts);
+  const dispatch = useDispatch();
 
   const handleChange = e => {
     const { name, value } = e.currentTarget;
@@ -25,14 +31,13 @@ export default function ContactsForm({ formData }) {
   };
 
   const handleSubmit = e => {
-    const id = nanoid();
-
     e.preventDefault();
-    formData({ name, number, id });
-    reset();
-  };
+    const similarContact = contacts.find(contact => contact.name === name);
 
-  const reset = () => {
+    if (similarContact) {
+      return toast.error(`${similarContact.name} is already in your list`);
+    } else dispatch(actions.addContact(name, number));
+
     setName('');
     setNumber('');
   };
@@ -71,7 +76,3 @@ export default function ContactsForm({ formData }) {
     </form>
   );
 }
-
-ContactsForm.propTypes = {
-  formData: PropTypes.func.isRequired,
-};

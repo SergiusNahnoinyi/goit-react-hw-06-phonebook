@@ -1,7 +1,15 @@
-import PropTypes from 'prop-types';
+import { useSelector, useDispatch } from 'react-redux';
+import { getVisibleContacts } from '../redux/phonebook-selectors';
+import * as actions from '../redux/phonebook-actions';
+
 import s from './Contacts.module.css';
 
-export default function ContactsList({ contacts, onDelete }) {
+export default function ContactsList() {
+  const contacts = useSelector(getVisibleContacts);
+  const dispatch = useDispatch();
+
+  const onDelete = id => dispatch(actions.deleteContact(id));
+
   return (
     <ul className={s.list}>
       {contacts.map(contact => (
@@ -13,14 +21,3 @@ export default function ContactsList({ contacts, onDelete }) {
     </ul>
   );
 }
-
-ContactsList.propTypes = {
-  onDelete: PropTypes.func.isRequired,
-  contacts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
-    }),
-  ),
-};
